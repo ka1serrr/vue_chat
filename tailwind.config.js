@@ -6,6 +6,12 @@ export default {
       padding: {
         layout: "8px",
       },
+      textColor: {
+        "main-white": "#F8F8F3",
+      },
+      fontSize: {
+        small: "12px",
+      },
     },
   },
   plugins: [require("daisyui")],
