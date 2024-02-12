@@ -5,3 +5,7 @@
 .center {
   @apply flex justify-center items-center
 }
+
+.text-error {
+  @apply text-red-400 font-bold
+}

@@ -4,6 +4,7 @@ type Props = {
   label?: string;
   modelValue?: string;
   error?: string;
+  className?: string;
 };
 
 withDefaults(defineProps<Props>(), {});
@@ -11,7 +12,7 @@ const modelValue = defineModel();
 </script>
 
 <template>
-  <div class="my-2">
+  <div class="my-2" :class="className">
     <label class="" v-if="label" :for="id">{{ label }}</label>
     <input
       v-bind="$attrs"
@@ -21,8 +22,8 @@ const modelValue = defineModel();
       :class="{ 'input-error': error }"
     />
 
-    <div v-if="error" class="text-red-500 font-bold text-xl">
+    <span v-if="error" class="text-error text-xl">
       {{ error }}
-    </div>
+    </span>
   </div>
 </template>

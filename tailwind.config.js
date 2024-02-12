@@ -8,6 +8,7 @@ export default {
       },
       textColor: {
         "main-white": "#F8F8F3",
+        "main-pink": "#FF79C6",
       },
       fontSize: {
         small: "12px",

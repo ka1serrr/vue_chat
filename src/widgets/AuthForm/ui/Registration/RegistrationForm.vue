@@ -5,10 +5,12 @@ import { BaseInput, FileInput } from "@/shared";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { ref as fbRef, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { doc, setDoc } from "firebase/firestore";
-
 import { auth, db, storage } from "@/app/firebase.config";
+
 import { useToast } from "vue-toastification";
-import { email, minLength, required } from "@vuelidate/validators";
+import { email, minLength, required, requiredIf } from "@vuelidate/validators";
+import type { TRegister } from "@/widgets";
+import { Redirect } from "@/entities";
 
 type Props = {
   formType: "Login" | "Registration";
@@ -18,11 +20,11 @@ const props = defineProps<Props>();
 
 const buttonText = computed(() => (props.formType === "Login" ? "Login" : "Register"));
 
-const formState = reactive({
+const formState = reactive<TRegister>({
   email: "",
   password: "",
   displayName: "",
-  avatar: Blob,
+  avatar: null,
 });
 
 const isLoading = vueRef<boolean>(false);
@@ -34,9 +36,9 @@ const validateRules = {
   displayName: { required, minLength: minLength(2) },
   password: { required, minLength: minLength(6) },
   avatar: {
-    requiredIf: () => {
-      return !!formState.avatar?.name;
-    },
+    required: requiredIf(() => {
+      return !formState.avatar;
+    }),
   },
 };
 
@@ -84,7 +86,7 @@ const handleSubmit = async () => {
             await setDoc(doc(db, "users", res.user.uid), {
               uid: res.user.uid,
               displayName: formState.displayName,
-              email: formState.displayName,
+              email: formState.email,
               photoURL: downloadUrl,
             });
           });
@@ -95,21 +97,23 @@ const handleSubmit = async () => {
     toast.success("ура");
   } catch (e) {
     toast.error("An error occurred on the server");
+  } finally {
+    isLoading.value = false;
   }
-  isLoading.value = false;
 };
 </script>
 
 <template>
-  <div class="center h-full">
+  <main class="center h-full">
     <form
       @submit.prevent="handleSubmit"
       class="flex flex-col items-center w-1/3 border rounded-xl border-slate-600 p-10"
     >
       <h1 class="text-3xl font-bold mb-5">{{ formType }}</h1>
       <BaseInput
-        class="mb-0.5 w-full"
+        class="w-full"
         v-model="formState.email"
+        class-name="mb-0.5"
         id="email"
         type="email"
         placeholder="Enter your email"
@@ -118,8 +122,9 @@ const handleSubmit = async () => {
       />
 
       <BaseInput
-        class="mb-0.5 w-full"
+        class="w-full"
         v-model="formState.password"
+        class-name="mb-0.5"
         id="password"
         type="password"
         placeholder="Enter your password"
@@ -127,8 +132,9 @@ const handleSubmit = async () => {
         :error="v$.password?.$errors[0]?.$message"
       />
       <BaseInput
-        class="w-full mb-1.5"
+        class="w-full"
         v-model="formState.displayName"
+        class-name="mb-1.5"
         id="displayName"
         placeholder="Enter your display name"
         :disabled="isLoading"
@@ -141,8 +147,17 @@ const handleSubmit = async () => {
         class="w-full"
         accept="image/png, image/jpeg"
         label="Choose your avatar"
+        :error="v$.avatar?.$errors[0]?.$uid"
       />
-      <button type="submit" class="btn btn-primary w-full mt-1.5" :disabled="isLoading">{{ buttonText }}</button>
+      <button
+        type="submit"
+        class="btn btn-primary w-full mt-1.5"
+        :disabled="isLoading"
+        :class="{ 'btn-error': v$.$error }"
+      >
+        {{ buttonText }}
+      </button>
+      <Redirect link="/login" />
     </form>
-  </div>
+  </main>
 </template>
