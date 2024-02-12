@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref as vueRef } from "vue";
 import { useVuelidate } from "@vuelidate/core";
-import { BaseInput, FileInput } from "@/shared";
+import { BaseInput, FileInput, transformError } from "@/shared";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { ref as fbRef, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { doc, setDoc } from "firebase/firestore";
@@ -11,6 +11,8 @@ import { useToast } from "vue-toastification";
 import { email, minLength, required, requiredIf } from "@vuelidate/validators";
 import type { TRegister } from "@/widgets";
 import { Redirect } from "@/entities";
+import { validateRules } from "@/widgets/AuthForm/ui/Registration/validateRules";
+import { useRouter } from "vue-router";
 
 type Props = {
   formType: "Login" | "Registration";
@@ -30,19 +32,9 @@ const formState = reactive<TRegister>({
 const isLoading = vueRef<boolean>(false);
 
 const toast = useToast();
+const router = useRouter();
 
-const validateRules = {
-  email: { required, email },
-  displayName: { required, minLength: minLength(2) },
-  password: { required, minLength: minLength(6) },
-  avatar: {
-    required: requiredIf(() => {
-      return !formState.avatar;
-    }),
-  },
-};
-
-const v$ = useVuelidate(validateRules, formState);
+const v$ = useVuelidate(validateRules(formState.avatar), formState);
 
 const changeAvatar = (event: Event) => {
   const target = event.target as HTMLInputElement;
@@ -89,14 +81,16 @@ const handleSubmit = async () => {
               email: formState.email,
               photoURL: downloadUrl,
             });
+            await setDoc(doc(db, "userChats", res.user.uid), {});
           });
         },
       );
     }
 
-    toast.success("ура");
+    toast.success("You are successfully registered");
+    await router.push({ name: "home" });
   } catch (e) {
-    toast.error("An error occurred on the server");
+    toast.error(transformError(e));
   } finally {
     isLoading.value = false;
   }
@@ -105,10 +99,7 @@ const handleSubmit = async () => {
 
 <template>
   <main class="center h-full">
-    <form
-      @submit.prevent="handleSubmit"
-      class="flex flex-col items-center w-1/3 border rounded-xl border-slate-600 p-10"
-    >
+    <form @submit.prevent="handleSubmit" class="form">
       <h1 class="text-3xl font-bold mb-5">{{ formType }}</h1>
       <BaseInput
         class="w-full"

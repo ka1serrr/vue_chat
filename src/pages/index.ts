@@ -1,3 +1,4 @@
 import RegisterPage from "./RegisterPage.vue";
 import LoginPage from "./LoginPage.vue";
-export { RegisterPage, LoginPage };
+import HomePage from "./HomePage.vue";
+export { RegisterPage, LoginPage, HomePage };
