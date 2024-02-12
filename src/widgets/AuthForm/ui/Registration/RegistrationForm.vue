@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { computed, reactive, ref as vueRef } from "vue";
-import { validateRules } from "./validateRueles";
 import { useVuelidate } from "@vuelidate/core";
 import { BaseInput, FileInput } from "@/shared";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { ref as fbRef, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { auth, storage } from "@/app/firebase.config";
+import { doc, setDoc } from "firebase/firestore";
+
+import { auth, db, storage } from "@/app/firebase.config";
 import { useToast } from "vue-toastification";
+import { email, minLength, required } from "@vuelidate/validators";
 
 type Props = {
   formType: "Login" | "Registration";
@@ -20,20 +22,32 @@ const formState = reactive({
   email: "",
   password: "",
   displayName: "",
+  avatar: Blob,
 });
+
+const isLoading = vueRef<boolean>(false);
 
 const toast = useToast();
 
-const v$ = useVuelidate(validateRules, formState);
+const validateRules = {
+  email: { required, email },
+  displayName: { required, minLength: minLength(2) },
+  password: { required, minLength: minLength(6) },
+  avatar: {
+    requiredIf: () => {
+      return !!formState.avatar?.name;
+    },
+  },
+};
 
-const avatar = vueRef<Blob | null>(null);
+const v$ = useVuelidate(validateRules, formState);
 
 const changeAvatar = (event: Event) => {
   const target = event.target as HTMLInputElement;
   const files = target?.files;
 
   if (files) {
-    avatar.value = files[0];
+    formState.avatar = files[0];
   }
 };
 
@@ -45,15 +59,16 @@ const handleSubmit = async () => {
   }
 
   try {
+    isLoading.value = true;
     const res = await createUserWithEmailAndPassword(auth, formState.email, formState.password);
 
     await updateProfile(res.user, {
       displayName: formState.displayName,
     });
 
-    if (avatar.value) {
+    if (formState.avatar) {
       const storageRef = fbRef(storage, formState.displayName);
-      const uploadTask = uploadBytesResumable(storageRef, avatar.value);
+      const uploadTask = uploadBytesResumable(storageRef, formState.avatar as unknown as Blob);
 
       uploadTask.on(
         "state_changed",
@@ -66,6 +81,12 @@ const handleSubmit = async () => {
             await updateProfile(res.user, {
               photoURL: downloadUrl,
             });
+            await setDoc(doc(db, "users", res.user.uid), {
+              uid: res.user.uid,
+              displayName: formState.displayName,
+              email: formState.displayName,
+              photoURL: downloadUrl,
+            });
           });
         },
       );
@@ -75,6 +96,7 @@ const handleSubmit = async () => {
   } catch (e) {
     toast.error("An error occurred on the server");
   }
+  isLoading.value = false;
 };
 </script>
 
@@ -91,6 +113,7 @@ const handleSubmit = async () => {
         id="email"
         type="email"
         placeholder="Enter your email"
+        :disabled="isLoading"
         :error="v$.email?.$errors[0]?.$message"
       />
 
@@ -100,6 +123,7 @@ const handleSubmit = async () => {
         id="password"
         type="password"
         placeholder="Enter your password"
+        :disabled="isLoading"
         :error="v$.password?.$errors[0]?.$message"
       />
       <BaseInput
@@ -107,11 +131,18 @@ const handleSubmit = async () => {
         v-model="formState.displayName"
         id="displayName"
         placeholder="Enter your display name"
+        :disabled="isLoading"
         :error="v$.displayName?.$errors[0]?.$message"
       />
 
-      <FileInput @change="changeAvatar" class="w-full" accept="image/png, image/jpeg" label="Choose your avatar" />
-      <button type="submit" class="btn btn-primary w-full mt-1.5">{{ buttonText }}</button>
+      <FileInput
+        @change="changeAvatar"
+        :disabled="isLoading"
+        class="w-full"
+        accept="image/png, image/jpeg"
+        label="Choose your avatar"
+      />
+      <button type="submit" class="btn btn-primary w-full mt-1.5" :disabled="isLoading">{{ buttonText }}</button>
     </form>
   </div>
 </template>
