@@ -2,7 +2,7 @@
 import { RouterView } from "vue-router";
 import { useCheckAuth } from "@/app/useCheckAuth";
 
-useCheckAuth();
+// useCheckAuth();
 </script>
 
 <template>

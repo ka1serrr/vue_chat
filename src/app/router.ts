@@ -1,4 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
+import { userStore } from "@/shared";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/app/firebase.config";
 
 const RegisterPage = () => import("@/pages/RegisterPage.vue");
 const LoginPage = () => import("@/pages/LoginPage.vue");
@@ -10,8 +13,8 @@ const routes = [
     name: "home",
     component: HomePage,
     meta: {
-      isAuth: true,
-      inNotAuth: false,
+      requireAuth: true,
+      requireUnauth: false,
     },
   },
   {
@@ -19,8 +22,8 @@ const routes = [
     name: "register",
     component: RegisterPage,
     meta: {
-      isAuth: false,
-      isNotAuth: true,
+      requireAuth: false,
+      requireUnauth: true,
     },
   },
   {
@@ -28,8 +31,8 @@ const routes = [
     name: "login",
     component: LoginPage,
     meta: {
-      isAuth: false,
-      isNotAuth: true,
+      requireAuth: false,
+      requireUnauth: true,
     },
   },
 ];
@@ -39,6 +42,26 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {});
+router.beforeEach((to, from, next) => {
+  const store = userStore();
+  const requireAuth = to.meta.requireAuth;
+  const requireUnauth = to.meta.requireUnauth;
+  onAuthStateChanged(auth, (user) => {
+    store.setUser(user);
+    if (requireAuth) {
+      if (user) {
+        next();
+      } else {
+        next("/login");
+      }
+    } else if (requireUnauth) {
+      if (user) {
+        next("/");
+      } else {
+        next();
+      }
+    }
+  });
+});
 
 export default router;
