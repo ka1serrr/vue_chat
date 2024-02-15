@@ -14,7 +14,4 @@ export const useCheckAuth = () => {
   onMounted(() => {
     login();
   });
-  onUnmounted(() => {
-    login();
-  });
 };

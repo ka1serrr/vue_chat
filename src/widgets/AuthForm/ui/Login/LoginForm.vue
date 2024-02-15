@@ -1,10 +1,15 @@
 <script setup lang="ts">
-import { BaseInput } from "@/shared";
+import { signInWithEmailAndPassword } from "firebase/auth";
+
+import { BaseInput, Heading, transformError } from "@/shared";
 import { reactive, ref } from "vue";
 import type { TLogin } from "@/widgets";
 import { Redirect } from "@/entities";
 import { useVuelidate } from "@vuelidate/core";
 import { validateRules } from "./validateRules";
+import { auth } from "@/app/firebase.config";
+import { useToast } from "vue-toastification";
+import { useRouter } from "vue-router";
 
 const formState = reactive<TLogin>({
   email: "",
@@ -12,13 +17,29 @@ const formState = reactive<TLogin>({
 });
 
 const isLoading = ref<boolean>(false);
+const toast = useToast();
 
 const v$ = useVuelidate(validateRules, formState);
+
+const router = useRouter();
+
+const handleSubmit = async () => {
+  try {
+    await signInWithEmailAndPassword(auth, formState.email, formState.password);
+    toast.success("You are successfully logged in");
+    await router.push({ name: "home" });
+  } catch (e) {
+    toast.error(transformError(e));
+  } finally {
+    isLoading.value = false;
+  }
+};
 </script>
 
 <template>
   <main class="center h-full">
-    <form @submit.prevent="" class="form">
+    <form @submit.prevent="handleSubmit" class="form">
+      <heading>Login</heading>
       <BaseInput
         class="w-full"
         v-model="formState.email"

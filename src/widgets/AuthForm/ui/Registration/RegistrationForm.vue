@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref as vueRef } from "vue";
 import { useVuelidate } from "@vuelidate/core";
-import { BaseInput, FileInput, transformError } from "@/shared";
+import { BaseInput, FileInput, Heading, transformError } from "@/shared";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { ref as fbRef, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { doc, setDoc } from "firebase/firestore";
@@ -13,14 +13,6 @@ import type { TRegister } from "@/widgets";
 import { Redirect } from "@/entities";
 import { validateRules } from "@/widgets/AuthForm/ui/Registration/validateRules";
 import { useRouter } from "vue-router";
-
-type Props = {
-  formType: "Login" | "Registration";
-};
-
-const props = defineProps<Props>();
-
-const buttonText = computed(() => (props.formType === "Login" ? "Login" : "Register"));
 
 const formState = reactive<TRegister>({
   email: "",
@@ -100,7 +92,7 @@ const handleSubmit = async () => {
 <template>
   <main class="center h-full">
     <form @submit.prevent="handleSubmit" class="form">
-      <h1 class="text-3xl font-bold mb-5">{{ formType }}</h1>
+      <heading>Registration</heading>
       <BaseInput
         class="w-full"
         v-model="formState.email"
@@ -142,11 +134,11 @@ const handleSubmit = async () => {
       />
       <button
         type="submit"
-        class="btn btn-primary w-full mt-1.5"
+        class="btn btn-primary w-full mt-1.5 capitalize"
         :disabled="isLoading"
         :class="{ 'btn-error': v$.$error }"
       >
-        {{ buttonText }}
+        Register
       </button>
       <Redirect link="/login" />
     </form>

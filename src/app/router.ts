@@ -9,16 +9,28 @@ const routes = [
     path: "/",
     name: "home",
     component: HomePage,
+    meta: {
+      isAuth: true,
+      inNotAuth: false,
+    },
   },
   {
     path: "/register",
     name: "register",
     component: RegisterPage,
+    meta: {
+      isAuth: false,
+      isNotAuth: true,
+    },
   },
   {
     path: "/login",
     name: "login",
     component: LoginPage,
+    meta: {
+      isAuth: false,
+      isNotAuth: true,
+    },
   },
 ];
 
@@ -26,5 +38,7 @@ const router = createRouter({
   history: createWebHistory(),
   routes,
 });
+
+router.beforeEach((to, from, next) => {});
 
 export default router;
