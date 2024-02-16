@@ -1,20 +1,23 @@
 import { userStore } from "@/shared";
+import type { TUser } from "@/shared";
 import { onMounted, onUnmounted } from "vue";
 import { auth } from "@/app/firebase.config";
 import { onAuthStateChanged } from "firebase/auth";
 import router from "@/app/router";
-export const useCheckAuth = async () => {
+export const useAuthState = async () => {
   const store = userStore();
 
-  const login = async () => {
-    return onAuthStateChanged(auth, (user) => {
-      store.setUser(user);
-    });
-  };
-
+  let unsubscribe: any;
   onMounted(() => {
-    login();
+    unsubscribe = onAuthStateChanged(auth, (data) => {
+      store.setUser(data);
+    });
   });
+  onUnmounted(() => unsubscribe());
+};
 
-  return { login };
+export const getUserState = async (): Promise<TUser> => {
+  return new Promise((resolve, reject) => {
+    onAuthStateChanged(auth, resolve, reject);
+  });
 };

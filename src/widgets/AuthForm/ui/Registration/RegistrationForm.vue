@@ -90,7 +90,7 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <main class="center h-full">
+  <main class="center w-full h-full">
     <form @submit.prevent="handleSubmit" class="form">
       <heading>Registration</heading>
       <BaseInput

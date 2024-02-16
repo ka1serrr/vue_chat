@@ -2,5 +2,5 @@
 import { Loader2 } from "lucide-vue-next";
 </script>
 <template>
-  <Loader2 class="animate-spin" />
+  <Loader2 class="animate-spin" :size="50" />
 </template>

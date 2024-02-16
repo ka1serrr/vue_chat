@@ -1,6 +1,6 @@
 <script setup lang="ts">
 type Props = {
-  headingSize?: "lg";
+  headingSize?: "lg" | "sm";
 };
 withDefaults(defineProps<Props>(), {
   headingSize: "lg",
@@ -10,8 +10,10 @@ withDefaults(defineProps<Props>(), {
 <template>
   <h2
     v-bind="$attrs"
+    class="font-bold"
     :class="{
-      'text-3xl font-bold mb-5 uppercase': headingSize === 'lg',
+      'text-3xl mb-5 uppercase': headingSize === 'lg',
+      'text-xl capitalize': headingSize === 'sm',
     }"
   >
     <slot></slot>
