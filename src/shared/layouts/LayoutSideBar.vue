@@ -4,7 +4,7 @@ import { SearchUser } from "@/features";
 </script>
 
 <template>
-  <div>
+  <div class="max-h-[600px] h-full bg-neutral rounded-tl-3xl">
     <NavBar />
     <SearchUser />
   </div>

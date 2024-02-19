@@ -6,12 +6,14 @@ const store = loadingStore();
 </script>
 
 <template>
-  <div class="center h-full w-full">
-    <router-view class="min-w-[350px]" name="LeftSidebar" />
-    <div class="center h-full" v-if="store.loading">
-      <Loader />
-    </div>
-    <router-view class="min-w-[500px]" v-else-if="!store.loading" />
+  <div class="container">
+    <main class="flex justify-center h-full w-full">
+      <router-view class="min-w-[350px] my-auto" name="LeftSidebar" />
+      <div class="center h-full" v-if="store.loading">
+        <Loader />
+      </div>
+      <router-view class="min-w-[500px] my-auto" v-else-if="!store.loading" />
+    </main>
   </div>
 </template>
 
