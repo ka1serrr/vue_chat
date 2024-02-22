@@ -4,10 +4,14 @@ export type TUser = UserInfo | null;
 
 export type TChatPreview = {
   imgLink: string;
-  photoURL: string;
+  photoUrl: string;
   lastMessage: string;
   uid: string;
   displayName: string;
 };
 
-export type TChatPreviews = TChatPreview[];
+export type TChats = {
+  date: string;
+  userInfo: TChatPreview;
+  id: string;
+};

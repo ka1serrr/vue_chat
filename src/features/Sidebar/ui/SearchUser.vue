@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { BaseInput, combineIds, Loader, userStore } from "@/shared";
-import { searchChat, searchUserStore } from "@/features";
+import { searchUserStore } from "@/features";
 import { watch } from "vue";
 import { useToast } from "vue-toastification";
 import { UserProfilePhoto } from "@/entities";
@@ -19,7 +19,7 @@ watch(
 );
 
 const createChat = async () => {
-  const combinedId = combineIds(userStoreState.user?.uid as string, store.chats?.uid as string);
+  const combinedId = combineIds(userStoreState.user?.uid as string, store.user?.uid as string);
 
   try {
     const res = await getDoc(doc(db, "chats", combinedId));
@@ -29,14 +29,16 @@ const createChat = async () => {
       if (userStoreState.user) {
         await updateDoc(doc(db, "userChats", userStoreState.user.uid), {
           [combinedId + ".userInfo"]: {
-            uid: store.chats?.uid,
-            displayName: store?.chats?.displayName,
-            photoUrl: store?.chats?.photoURL,
+            uid: store.user?.uid,
+            displayName: store?.user?.displayName,
+            photoUrl: store?.user?.photoURL,
           },
           [combinedId + ".date"]: serverTimestamp(),
         });
+      }
 
-        await updateDoc(doc(db, "userChats", store.chats.uid), {
+      if (store.user) {
+        await updateDoc(doc(db, "userChats", store.user.uid), {
           [combinedId + ".userInfo"]: {
             uid: userStoreState.user?.uid,
             displayName: userStoreState?.user?.displayName,
@@ -66,12 +68,12 @@ const createChat = async () => {
     <Loader v-if="store.isLoading" class="m-auto" />
     <div
       @click="createChat"
-      v-if="store.chats"
+      v-if="store.user && store.username"
       class="border-b border-secondary flex items-center p-layout gap-5 cursor-pointer hover:opacity-75 transition-opacity duration-200"
     >
-      <UserProfilePhoto :profile-photo="store?.chats?.photoURL" class="w-12 h-12" />
+      <UserProfilePhoto :profile-photo="store?.user?.photoURL" class="w-12 h-12" />
       <div class="text-xl font-bold">
-        <span>{{ store.chats?.displayName }}</span>
+        <span>{{ store.user?.displayName }}</span>
       </div>
     </div>
   </div>

@@ -7,7 +7,7 @@ interface Store {
   isLoading: boolean;
   isError: boolean;
   errorMessage: string;
-  chats: TChatPreview | null;
+  user: TChatPreview | null;
   username: string;
 }
 
@@ -16,7 +16,7 @@ export const searchUserStore = defineStore("searchUser", {
     isError: false,
     isLoading: false,
     errorMessage: "",
-    chats: null,
+    user: null,
     username: "",
   }),
   actions: {
@@ -31,7 +31,7 @@ export const searchUserStore = defineStore("searchUser", {
         const querySnapshot = await getDocs(query);
         querySnapshot.forEach((doc) => {
           // @ts-ignore
-          this.chats = doc.data();
+          this.user = doc.data();
         });
       } catch (e) {
         this.isError = true;
@@ -40,7 +40,7 @@ export const searchUserStore = defineStore("searchUser", {
       }
     },
     reset() {
-      this.chats = null;
+      this.user = null;
       this.username = "";
     },
   },
