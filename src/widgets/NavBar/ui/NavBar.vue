@@ -8,7 +8,7 @@ const user = userStore();
 </script>
 
 <template>
-  <div class="flex items-center justify-between p-layout border-b border-secondary">
+  <div class="flex items-center justify-between p-layout border-secondary bg-neutral-content/10 min-h-[56px]">
     <heading heading-size="sm">My chat</heading>
     <div class="flex items-center gap-2">
       <UserProfilePhoto :profile-photo="user.user?.photoURL" />

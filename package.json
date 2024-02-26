@@ -20,6 +20,7 @@
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
     "theme-change": "^2.5.0",
+    "uuid": "^9.0.1",
     "vue": "^3.4.15",
     "vue-router": "^4.2.5",
     "vue-toastification": "^2.0.0-rc.5"
@@ -27,6 +28,7 @@
   "devDependencies": {
     "@tsconfig/node20": "^20.1.2",
     "@types/node": "^20.11.10",
+    "@types/uuid": "^9.0.8",
     "@vitejs/plugin-vue": "^5.0.3",
     "@vitejs/plugin-vue-jsx": "^3.1.0",
     "@vue/tsconfig": "^0.5.1",

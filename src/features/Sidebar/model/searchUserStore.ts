@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import type { TChatPreview, TChatPreviews } from "@/shared";
+import type { TChatPreview } from "@/shared";
 import { getDocs } from "firebase/firestore";
 import { searchUser } from "@/features";
 

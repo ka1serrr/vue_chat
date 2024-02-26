@@ -1,5 +1,7 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { Chat } from "@/widgets";
+</script>
 
 <template>
-  <h1>this is homepage</h1>
+  <Chat />
 </template>

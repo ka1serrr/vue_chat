@@ -4,9 +4,9 @@ import { SearchUser } from "@/features";
 </script>
 
 <template>
-  <div class="max-h-[600px] h-full bg-neutral rounded-tl-3xl overflow-y-auto">
+  <aside class="max-h-[600px] h-full bg-neutral rounded-tl-3xl overflow-y-auto">
     <NavBar />
     <SearchUser />
     <ChatPreviews />
-  </div>
+  </aside>
 </template>

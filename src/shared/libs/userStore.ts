@@ -1,7 +1,5 @@
 import { defineStore } from "pinia";
 import type { TUser } from "@/shared";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "@/app/firebase.config";
 
 interface State {
   user: TUser;
